@@ -1,0 +1,190 @@
+<html lang="es">
+  <head>
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .form-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin: 10px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      label {
+        margin-top: 10px;
+      }
+
+      input {
+        padding: 5px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      button {
+        padding: 10px;
+        margin-top: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      span {
+        color: red;
+      }
+    </style>
+
+    <script type="module">
+      const $ = (selector) => document.querySelector(selector)
+      const loginForm = $('#login-form')
+      const loginSpan = $('#login-span')
+
+      const registerForm = $('#register-form')
+      const registerSpan = $('#register-span')
+
+      const logoutButton = $('#logout-button')
+
+      loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const username = $('#login-username').value
+        const password = $('#login-password').value
+
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        })
+
+        if (response.ok) {
+          loginSpan.innerText = 'Usuario autenticado. Entrando...'
+          loginSpan.style.color = 'green'
+          setTimeout(() => {
+            window.location.href = '/protected'
+          }, 2000)
+        } else {
+          loginSpan.innerText = 'Error al autenticar usuario'
+          loginSpan.style.color = 'red'
+        }
+      })
+
+      registerForm?.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const username = $('#register-username').value
+        const password = $('#register-password').value
+        const confirmPassword = $('#register-confirm-password').value
+
+        if (password !== confirmPassword) {
+          alert('Las contraseñas no coinciden')
+          return
+        }
+
+        const response = await fetch('/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username, password }),
+        })
+
+        console.log(response)
+        if (response.ok) {
+          registerSpan.innerText = 'Usuario registrado. Entrando...'
+          registerSpan.style.color = 'green'
+          setTimeout(() => {
+            window.location.href = '/protected'
+          }, 2000)
+        } else {
+          registerSpan.innerText = 'Error al registrar usuario'
+          registerSpan.style.color = 'red'
+        }
+      })
+
+      logoutButton?.addEventListener('click', async () => {
+        e.preventDefault()
+        const response = await fetch('/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        console.log(res)
+        window.location.href = '/'
+      })
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <% if (typeof username !== 'undefined') { %>
+        <div class="form-container">
+          <h1>Bienvenido <%= username %></h1>
+          <p>Estas en el panel de Administración</p>
+          <button id="logout-button">Logout</button>
+        </div>
+      <% } %>
+
+      <% if (typeof username === 'undefined') { %>
+        <div class="form-container">
+          <form id="login-form">
+            <h2>Login</h2>
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" required>
+
+            <label for="login-password">Password</label>
+            <input type="text" id="login-password" required>
+
+            <button type="submit">Login</button>
+            <span id="login-span">&nbsp;</span>
+          </form>
+        </div>
+
+        <div class="form-container">
+          <form id="register-form">
+            <h2>Register</h2>
+            <label for="register-username">Username</label>
+            <input type="text" id="register-username" required>
+
+            <label for="register-password">Password</label>
+            <input type="text" id="register-password" required>
+
+            <label for="register-confirm-password">Confirm Password</label>
+            <input type="text" id="register-confirm-password" required>
+
+            <button type="submit">Register</button>
+            <span id="register-span">&nbsp;</span>
+          </form>
+        </div>
+      <% } %> 
+    </div>
+  </body>
+</html>
